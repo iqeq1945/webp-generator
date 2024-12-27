@@ -57,7 +57,7 @@ app.get("/convert/:id", async (req, res) => {
     const webpBuffer = await sharp(filePath)
       .composite([
         {
-          input: Buffer.from(svgText),
+          input: Buffer.from(svgText, "utf-8"),
           top: 0,
           left: 0,
         },
