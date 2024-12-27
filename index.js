@@ -1,31 +1,34 @@
 const express = require("express");
 const sharp = require("sharp");
-const fs = require("fs");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
+const port = 3000;
 
-// Static route to serve images
 app.get("/convert", async (req, res) => {
-  const pngPath = path.join(__dirname, "image.png"); // Input PNG file path
-  const webpPath = path.join(__dirname, "image.webp"); // Output WebP file path
+  const { fileName } = req.query;
+  if (!fileName) {
+    return res.status(400).send("파일 이름을 제공해주세요.");
+  }
+
+  const filePath = path.join(__dirname, "image", fileName);
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send("파일을 찾을 수 없습니다.");
+  }
 
   try {
-    // Convert PNG to WebP
-    await sharp(pngPath)
-      .webp({ quality: 80 }) // Adjust quality as needed
-      .toFile(webpPath);
+    const webpBuffer = await sharp(filePath).webp().toBuffer();
 
-    // Serve WebP image with correct Content-Type
     res.set("Content-Type", "image/webp");
-    res.sendFile(webpPath);
+    res.send(webpBuffer);
   } catch (error) {
-    console.error("Error during conversion:", error);
-    res.status(500).send("Error converting image");
+    console.error(error);
+    res.status(500).send("이미지를 변환하는 데 실패했습니다.");
   }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
 });
