@@ -7,12 +7,7 @@ const app = express();
 const port = 3000;
 
 app.get("/convert", async (req, res) => {
-  const { fileName } = req.query;
-  if (!fileName) {
-    return res.status(400).send("파일 이름을 제공해주세요.");
-  }
-
-  const filePath = path.join(__dirname, "image", fileName);
+  const filePath = path.join(__dirname, "image");
 
   if (!fs.existsSync(filePath)) {
     return res.status(404).send("파일을 찾을 수 없습니다.");
