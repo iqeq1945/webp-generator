@@ -22,20 +22,31 @@ app.get("/convert/:id", async (req, res) => {
     const metadata = await sharp(filePath).metadata();
 
     // SVG 텍스트를 원본 이미지 크기에 맞게 생성
-    const maxLength = 4;
+    const maxLength = 6;
     const lines = [];
-    for (let i = 0; i < text.length; i += maxLength) {
-      lines.push(text.slice(i, i + maxLength));
+    let currentLine = "";
+
+    for (let char of text) {
+      currentLine += char; // 현재 줄에 문자 추가
+      if (currentLine.length === maxLength || char === " ") {
+        // 최대 길이에 도달하거나 빈칸일 경우
+        lines.push(currentLine); // 줄에 추가
+        currentLine = ""; // 현재 줄 초기화
+      }
     }
+    if (currentLine) {
+      lines.push(currentLine); // 남은 문자 추가
+    }
+
     const svgText = `
       <svg width="${metadata.width}" height="${metadata.height}">
         <style>
-          .title { fill: #000; font-size: 64px; font-family: sans-serif; text-anchor: end; dominant-baseline: middle; }
+          .title { fill: #000; font-size: 48px; font-family: sans-serif; text-anchor: end; dominant-baseline: middle; }
         </style>
         ${lines
           .map(
             (line, index) =>
-              `<text x="${metadata.width * 0.7}" y="${
+              `<text x="${metadata.width * 0.85}" y="${
                 metadata.height / 2 + index * 50
               }" class="title">${line}</text>`
           )
