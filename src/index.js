@@ -6,8 +6,11 @@ const fs = require("fs");
 const app = express();
 const port = 3000;
 
+// 정적 파일 경로 설정
+app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/convert", async (req, res) => {
-  const filePath = path.join(__dirname, "image");
+  const filePath = path.join(__dirname, "..", "public", "image.png");
 
   if (!fs.existsSync(filePath)) {
     return res.status(404).send("파일을 찾을 수 없습니다.");
